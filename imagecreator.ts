@@ -86,6 +86,10 @@ export abstract class BaseCreator {
             }
         });
     }
+    
+    static getImgurUrl(id:string):string {
+            return "http://www.imgur.com/" + id;
+    }
 }
 
 export class PngCreator extends BaseCreator {
@@ -123,7 +127,7 @@ export class GIFCreator extends BaseCreator {
     }
 
     addFrame(canvas: HTMLCanvasElement, delay: number) {
-        this.gif.addFrame(canvas, { delay: 25, copy: true });
+        this.gif.addFrame(canvas, { delay: delay, copy: true });
     }
 
 
@@ -141,6 +145,44 @@ export class GIFCreator extends BaseCreator {
                     onDone();
             }
         });
+    }
+
+}
+
+export class AlbumCreator {
+
+    private static imgurClientId: string = "d3c0f0cb829f983";
+
+    //static createAlbum(ids: string[], title: string, description: string, layout: "blog"|"grid"|"horizontal"|"vertical") {
+    static createAlbum(ids: string[], onDone: Function, title?: string, description?: string, layout?: string, coverId?: string) {
+
+        let self = this;
+        $.ajax({
+            url: "https://api.imgur.com/3/album",
+            type: "POST",
+            dataType: "json",
+            data: {
+                ids: ids,
+                title: title,
+                description: description
+            },
+            success: function(data) {
+                if (onDone)
+                    onDone(true, data.data.id);
+            },
+            error: function(data) {
+                console.log(JSON.stringify(data));
+                if (onDone)
+                    onDone(false, "");
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("Authorization", "Client-ID " + self.imgurClientId);
+            }
+        });
+    }
+    
+    static getImgurUrl(id:string):string {
+        return "http://www.imgur.com/a/" + id;
     }
 
 }
