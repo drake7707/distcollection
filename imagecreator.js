@@ -1,3 +1,4 @@
+/// <reference path="../typings/jquery.d.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -63,6 +64,9 @@ var BaseCreator = (function () {
             }
         });
     };
+    BaseCreator.getImgurUrl = function (id) {
+        return "http://www.imgur.com/" + id;
+    };
     return BaseCreator;
 })();
 exports.BaseCreator = BaseCreator;
@@ -96,7 +100,7 @@ var GIFCreator = (function (_super) {
         return "image/gif";
     };
     GIFCreator.prototype.addFrame = function (canvas, delay) {
-        this.gif.addFrame(canvas, { delay: 25, copy: true });
+        this.gif.addFrame(canvas, { delay: delay, copy: true });
     };
     GIFCreator.prototype.render = function (onDone) {
         this.gif.render();
@@ -114,3 +118,39 @@ var GIFCreator = (function (_super) {
     return GIFCreator;
 })(BaseCreator);
 exports.GIFCreator = GIFCreator;
+var AlbumCreator = (function () {
+    function AlbumCreator() {
+    }
+    //static createAlbum(ids: string[], title: string, description: string, layout: "blog"|"grid"|"horizontal"|"vertical") {
+    AlbumCreator.createAlbum = function (ids, onDone, title, description, layout, coverId) {
+        var self = this;
+        $.ajax({
+            url: "https://api.imgur.com/3/album",
+            type: "POST",
+            dataType: "json",
+            data: {
+                ids: ids,
+                title: title,
+                description: description
+            },
+            success: function (data) {
+                if (onDone)
+                    onDone(true, data.data.id);
+            },
+            error: function (data) {
+                console.log(JSON.stringify(data));
+                if (onDone)
+                    onDone(false, "");
+            },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Authorization", "Client-ID " + self.imgurClientId);
+            }
+        });
+    };
+    AlbumCreator.getImgurUrl = function (id) {
+        return "http://www.imgur.com/a/" + id;
+    };
+    AlbumCreator.imgurClientId = "d3c0f0cb829f983";
+    return AlbumCreator;
+})();
+exports.AlbumCreator = AlbumCreator;
