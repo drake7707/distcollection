@@ -8,6 +8,7 @@ declare module ImageCreator {
     getImageElement(): HTMLImageElement;
     uploadToImgur(title: string, description: string, onDone: (success: boolean, id: string) => void): void;
     updateImgurDescription(description: string): void;
+    static getImgurUrl(id:string):string;
 }
  class PngCreator extends BaseCreator {
     constructor();
@@ -20,6 +21,11 @@ declare module ImageCreator {
     protected getMimeType(): string;
     addFrame(canvas: HTMLCanvasElement, delay: number): void;
     render(onDone: Function): void;
+}
+
+class AlbumCreator {
+    static createAlbum(ids: string[], onDone: Function, title?: string, description?: string, layout?: string, coverId?: string);    
+    static getImgurUrl(id:string):string;
 }
 
 }
